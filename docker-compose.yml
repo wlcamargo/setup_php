@@ -1,7 +1,5 @@
 services:
   web:
-    # "Fat" image that already includes extensions (mysqli, pdo, gd, zip, etc.)
-    # Avoids having to create a manual Dockerfile with an apt-get update fix
     image: webdevops/php-apache:7.2
     container_name: php_app_72
     ports:
