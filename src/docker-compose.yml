@@ -1,0 +1,43 @@
+services:
+  web:
+    # "Fat" image that already includes extensions (mysqli, pdo, gd, zip, etc.)
+    # Avoids having to create a manual Dockerfile with an apt-get update fix
+    image: webdevops/php-apache:7.2
+    container_name: php_app_72
+    ports:
+      - "8083:80"
+    environment:
+      # WebDevOps allows PHP configuration via environment variables
+      WEB_DOCUMENT_ROOT: /app
+      PHP_DISPLAY_ERRORS: 1
+      PHP_DATE_TIMEZONE: "America/Sao_Paulo"
+    volumes:
+      # Maps the current folder to the image's document root
+      - ./src:/app
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_db
+    ports:
+      - "3001:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
